@@ -2,7 +2,7 @@
 # Eerste actie: kijk naar lijst van alle path available dictories + files
 # Configuratie van jobs // github actions environment variables (niet allemaal encrypted)
 # This is a basic workflow to help you get started with Actions
-# test2
+# test3
 
 name: CI
 
