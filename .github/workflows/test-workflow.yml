@@ -28,6 +28,9 @@ jobs:
       - id: dotenv
         name: Dotenv Action
         uses: falti/dotenv-action@v0.2.5
+          with:
+          path: .env.dev
+          log-variables: true
 
       # Runs a single command using the runners shell
       - name: Run a one-line script
