@@ -1,3 +1,7 @@
+# https://github.com/marketplace/actions/deployment-action
+# Eerste actie: kijk naar lijst van alle path available dictories + files
+# Configuratie van jobs // github actions environment variables (niet allemaal encrypted)
+# Install github runner 
 # This is a basic workflow to help you get started with Actions
 
 name: CI
@@ -33,5 +37,3 @@ jobs:
           echo Add other actions to build,
           echo test, and deploy your project.
 
-      - name: Install python dependencies
-        run: pipenv install
