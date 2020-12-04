@@ -36,11 +36,20 @@ jobs:
       - name: Show containers
         run: docker container ls -a 
 
+      - name: Kill docker containers
+        run: docker ps -q -a --filter "status=running" --filter "ancestor=davidtest:latest" | ForEach-Object { docker kill $_ }
+
+      - name: Show containers
+        run: docker container ls -a 
+
       - name: Show images
         run: docker images -a 
 
-      - name: Kill docker containers
-        run: docker ps -q -a --filter "status=running" --filter "ancestor=davidtest:latest" | ForEach-Object { docker kill $_ }
+      - name: Remove old images
+        run: docker rmi $(docker images --format "{{.Repository}}:{{.Tag}}"|findstr "davidtest") 
+
+      - name: Show images
+        run: docker images -a 
 
       - name: Build docker container
         run: docker build -t davidtest:${{github.sha}} .
