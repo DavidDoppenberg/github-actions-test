@@ -37,6 +37,7 @@ jobs:
           docker container ls -a 
           docker images -a 
 
+      # TODO: this action fails if no images where found or if it cannot remove a non existing image
       - name: Remove old images
         run: docker rmi $(docker images --format "{{.Repository}}:{{.Tag}}"|findstr "davidtest") 
  
