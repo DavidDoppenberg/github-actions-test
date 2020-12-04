@@ -33,23 +33,22 @@ jobs:
           log-variables: true
 
       # Runs a single docker command
-      - name: Show containers
-        run: docker container ls -a 
-
-      - name: Show images
-        run: docker images -a 
+      - name: Multiple docker commands in one line
+        run: |
+          docker container ls -a 
+          docker images -a 
 
       - name: Remove old images
         run: docker rmi $(docker images --format "{{.Repository}}:{{.Tag}}"|findstr "davidtest") 
 
-      - name: Build docker container
+      - name: Build docker image
         run: docker build -t davidtest:${{github.sha}} .
 
       - name: Kill docker containers
-        run: docker ps -q -a --filter "status=running" --filter "ancestor=davidtest:latest" | ForEach-Object { docker kill $_ }
+        run: docker ps -q -a --filter "status=running" --filter "ancestor=davidtest" | ForEach-Object { docker kill $_ }
     
       - name: Remove not running containers
-        run: docker ps -q -a --filter "status=exited" --filter "ancestor=ca-portal:dev" | ForEach-Object { docker rm $_ }
+        run: docker ps -q -a --filter "status=exited" --filter "ancestor=davidtest" | ForEach-Object { docker rm $_ }
 
       - name: Run docker container
         run: docker container run davidtest:${{github.sha}} python app.py
