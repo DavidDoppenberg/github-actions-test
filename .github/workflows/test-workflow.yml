@@ -33,31 +33,32 @@ jobs:
           log-variables: true
 
       # Runs a single docker command
-      - name: Show containers
-        run: docker container ls -a 
-
-      - name: Kill docker containers
-        run: docker ps -q -a --filter "status=running" --filter "ancestor=davidtest:latest" | ForEach-Object { docker kill $_ }
-
-      - name: Show containers
-        run: docker container ls -a 
-
-      - name: Show images
-        run: docker images -a 
+      - name: Show containers and images
+        run: |
+        docker container ls -a 
+        docker images -a 
 
       - name: Remove old images
         run: docker rmi $(docker images --format "{{.Repository}}:{{.Tag}}"|findstr "davidtest") 
 
-      - name: Show images
-        run: docker images -a 
-
       - name: Build docker container
         run: docker build -t davidtest:${{github.sha}} .
-      
-      - name: Run docker container
-        run: docker container run davidtest:latest python app.py
 
-      # Runs a set of commands using the runners shell
+      - name: Kill docker containers
+        run: docker ps -q -a --filter "status=running" --filter "ancestor=davidtest:latest" | ForEach-Object { docker kill $_ }
+    
+      - name: Remove not running containers
+        run: docker ps -q -a --filter "status=exited" --filter "ancestor=ca-portal:dev" | ForEach-Object { docker rm $_ }
+
+      - name: Run docker container
+        run: docker container run davidtest:${{github.sha}} python app.py
+
+      - name: Show containers and images
+        run: |
+        docker container ls -a 
+        docker images -a 
+      
+        # Runs a set of commands using the runners shell
       - name: Run a one-line script with a secret
         run: echo ${{ secrets.SECRET_MESSAGE }}
 
