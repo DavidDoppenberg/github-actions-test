@@ -37,13 +37,13 @@ jobs:
         run: docker container ls -a 
 
       - name: Show images
-        run: docker images ls -a 
+        run: docker images -a 
 
       - name: Kill docker containers
         run: docker ps -q -a --filter "status=running" --filter "ancestor=davidtest:latest" | ForEach-Object { docker kill $_ }
 
       - name: Build docker container
-        run: docker build -t davidtest:$GITHUB_SHA .
+        run: docker build -t davidtest:${{github.sha}} .
       
       - name: Run docker container
         run: docker container run davidtest:latest python app.py
