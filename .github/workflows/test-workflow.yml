@@ -33,11 +33,17 @@ jobs:
           log-variables: true
 
       # Runs a single docker command
-      - name: Run a docker command
+      - name: Show containers
         run: docker container ls -a 
 
+      - name: Show images
+        run: docker images ls -a 
+
+      - name: Kill docker containers
+        run: docker ps -q -a --filter "status=running" --filter "ancestor=davidtest:latest" | ForEach-Object { docker kill $_ }
+
       - name: Build docker container
-        run: docker build -t davidtest:latest .
+        run: docker build -t davidtest:$GITHUB_SHA .
       
       - name: Run docker container
         run: docker container run davidtest:latest python app.py
