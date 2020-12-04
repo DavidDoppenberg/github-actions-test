@@ -37,11 +37,11 @@ jobs:
           docker container ls -a 
           docker images -a 
 
-      - name: Build docker image
-        run: docker build -t davidtest:${{github.sha}} .
-
       - name: Remove old images
         run: docker rmi $(docker images --format "{{.Repository}}:{{.Tag}}"|findstr "davidtest") 
+ 
+      - name: Build docker image
+        run: docker build -t davidtest:${{github.sha}} .
 
       - name: Kill and remove old docker containers
         run: |
