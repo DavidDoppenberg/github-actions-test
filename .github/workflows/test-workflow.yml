@@ -32,38 +32,33 @@ jobs:
           path: .env.dev
           log-variables: true
 
-      # Runs a single docker command
-      - name: Multiple docker commands in one line
+      - name: List all current containers and images
         run: |
           docker container ls -a 
           docker images -a 
 
-      - name: Remove old images
-        run: docker rmi $(docker images --format "{{.Repository}}:{{.Tag}}"|findstr "davidtest") 
-
       - name: Build docker image
         run: docker build -t davidtest:${{github.sha}} .
 
-      - name: Kill docker containers
-        run: docker ps -q -a --filter "status=running" --filter "ancestor=davidtest" | ForEach-Object { docker kill $_ }
-    
-      - name: Remove not running containers
-        run: docker ps -q -a --filter "status=exited" --filter "ancestor=davidtest" | ForEach-Object { docker rm $_ }
+      - name: Remove old images
+        run: docker rmi $(docker images --format "{{.Repository}}:{{.Tag}}"|findstr "davidtest") 
+
+      - name: Kill and remove old docker containers
+        run: |
+          docker ps -q -a --filter "status=running" --filter "ancestor=davidtest" | ForEach-Object { docker kill $_ }
+          docker ps -q -a --filter "status=exited" --filter "ancestor=davidtest" | ForEach-Object { docker rm $_ }
 
       - name: Run docker container
         run: docker container run davidtest:${{github.sha}} python app.py
 
-      - name: Show containers
-        run: docker container ls -a 
-
-      - name: Show images
-        run: docker images -a 
+      - name: List all current containers and images
+        run: |
+          docker container ls -a 
+          docker images -a 
       
         # Runs a set of commands using the runners shell
-      - name: Run a one-line script with a secret
-        run: echo ${{ secrets.SECRET_MESSAGE }}
-
-      # Runs a set of commands using the runners shell
-      - name: Run a one-line script with an environment variable
-        run: echo ${{ steps.dotenv.outputs.TEST_VAR }}
+      - name: Run a script that uses environment variables
+        run: |
+          echo ${{ secrets.SECRET_MESSAGE }}
+          echo ${{ steps.dotenv.outputs.TEST_VAR }}
 
