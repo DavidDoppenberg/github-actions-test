@@ -39,7 +39,7 @@ jobs:
 
       # TODO: this action fails if no images where found or if it cannot remove a non existing image
       - name: Remove old images
-        run: docker rmi $(docker images --format "{{.Repository}}:{{.Tag}}"|findstr "davidtest") 
+        run: docker images -a --filter "reference=davidtest:*" | ForEach-Object { docker rmi $_ }
  
       - name: Build docker image
         run: docker build -t davidtest:${{github.sha}} .
