@@ -40,8 +40,8 @@ jobs:
       #TODO: only kill containers if building was OK
       - name: Kill and remove old docker containers
         run: |
-          docker ps -q -a --filter "status=running" | findstr "davidtest" | ForEach-Object { docker kill $_ }
-          docker ps -q -a --filter "status=exited" | findstr "davidtest" | ForEach-Object { docker rm $_ }
+          docker ps -a --filter "status=running" --format '{{.ID}} {{.Image}}' | findstr "davidtest" | ForEach-Object { docker kill $_ }
+          docker ps -a --filter "status=exited" --format '{{.ID}} {{.Image}}' | findstr "davidtest" | ForEach-Object { docker rm $_ }
 
       # You cannot just pass the full lines to docker rmi. The command expects an image ID, so you need to extract that from the string
       - name: Remove old images
