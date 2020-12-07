@@ -37,9 +37,9 @@ jobs:
           docker container ls -a 
           docker images -a 
 
-      # TODO: this action fails if no images where found or if it cannot remove a non existing image
+      # You cannot just pass the full lines to docker rmi. The command expects an image ID, so you need to extract that from the string
       - name: Remove old images
-        run: docker images -a --filter "reference=davidtest:*" | ForEach-Object { docker rmi $_ }
+        run: docker images -a --filter "reference=davidtest:*" | ForEach-Object {docker rmi ($_ -split '\s+')[2]} 
  
       - name: Build docker image
         run: docker build -t davidtest:${{github.sha}} .
