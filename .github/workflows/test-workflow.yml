@@ -51,7 +51,7 @@ jobs:
         run: docker build -t davidtest:${{github.sha}} .
 
       - name: Run docker container
-        run: docker container run --env-file .env davidtest:${{github.sha}} python app.py
+        run: docker container run --env-file .env davidtest:${{github.sha}} python app.py --port 80
 
       - name: List all current containers and images
         run: |
