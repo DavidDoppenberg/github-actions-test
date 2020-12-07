@@ -51,7 +51,7 @@ jobs:
           docker ps -q -a --filter "status=exited" --filter "ancestor=davidtest" | ForEach-Object { docker rm $_ }
 
       - name: Run docker container
-        run: docker container run davidtest:${{github.sha}} python app.py
+        run: docker container run --env-file .env davidtest:${{github.sha}} python app.py
 
       - name: List all current containers and images
         run: |
