@@ -37,17 +37,18 @@ jobs:
           docker container ls -a 
           docker images -a 
 
+      #TODO: only kill containers if building was OK
+      - name: Kill and remove old docker containers
+        run: |
+          docker ps -q -a --filter "status=running" --filter "ancestor=davidtest" | ForEach-Object { docker kill $_ }
+          docker ps -q -a --filter "status=exited" --filter "ancestor=davidtest" | ForEach-Object { docker rm $_ }
+
       # You cannot just pass the full lines to docker rmi. The command expects an image ID, so you need to extract that from the string
       - name: Remove old images
         run: docker images -a --filter "reference=davidtest:*" --format "{{.Repository}}:{{.Tag}}" | ForEach-Object { docker rmi $_ } 
  
       - name: Build docker image
         run: docker build -t davidtest:${{github.sha}} .
-
-      - name: Kill and remove old docker containers
-        run: |
-          docker ps -q -a --filter "status=running" --filter "ancestor=davidtest" | ForEach-Object { docker kill $_ }
-          docker ps -q -a --filter "status=exited" --filter "ancestor=davidtest" | ForEach-Object { docker rm $_ }
 
       - name: Run docker container
         run: docker container run --env-file .env davidtest:${{github.sha}} python app.py
