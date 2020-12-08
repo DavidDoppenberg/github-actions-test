@@ -20,17 +20,12 @@ jobs:
     # The type of runner that the job will run on
     runs-on: self-hosted
 
+    # TODO: env in 
+
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-
-      - id: dotenv
-        name: Dotenv Action
-        uses: falti/dotenv-action@v0.2.5
-        with:
-          path: .env.dev
-          log-variables: true
 
       - name: List all current containers and images
         run: |
@@ -38,6 +33,7 @@ jobs:
           docker images -a 
 
       #TODO: only kill containers if building was OK
+      #TODO: use before filter of current github commit hash to filter images and containers
       - name: Kill and remove old docker containers
         run: |
           docker ps -a --filter "status=running" --format '{{.ID}} {{.Image}}' | findstr "davidtest" | ForEach-Object { docker kill $_.split(" ")[0] }
@@ -51,19 +47,18 @@ jobs:
         run: docker build -t davidtest:${{github.sha}} .
 
       - name: Run docker container
-        run: docker container run --env-file .env davidtest:${{github.sha}} python app.py --port 80
+        run: docker container run --env-file .env davidtest:${{github.sha}} python app.py
         env:
           TEST_VAR: "test variable"
           SECRET:  ${{ secrets.SECRET_MESSAGE }}
+
+      - name: check connection
+        run: |
+          $response = curl https://www.google.com
+          echo $response.statusCode
+          Get-Content README.md
 
       - name: List all current containers and images
         run: |
           docker container ls -a 
           docker images -a 
-      
-        # Runs a set of commands using the runners shell
-      - name: Run a script that uses environment variables
-        run: |
-          echo ${{ secrets.SECRET_MESSAGE }}
-          echo ${{ steps.dotenv.outputs.TEST_VAR }}
-
