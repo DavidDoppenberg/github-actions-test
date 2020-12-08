@@ -25,7 +25,9 @@ args = parser.parse_args()
 
 # ENV
 test_var = read_env("TEST_VAR", optional=True)
+secret = read_env("SECRET", optional=True)
 
 print("Hello!")
 print("CLI variable:", args.port)
 print("ENV variable:", test_var)
+print("Secret:", secret)
