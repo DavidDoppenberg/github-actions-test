@@ -44,10 +44,10 @@ jobs:
 
       #TODO: only kill containers if building was OK
       #TODO: use before filter of current github commit hash to filter images and containers
-      - name: Kill and remove old docker containers
-        run: |
-          docker ps -a --filter "status=running" --format '{{.ID}} {{.Image}}' | findstr "davidtest" | ForEach-Object { docker kill $_.split(" ")[0] }
-          docker ps -a --filter "status=exited" --format '{{.ID}} {{.Image}}' | findstr "davidtest" | ForEach-Object { docker rm $_.split(" ")[0] }
+#      - name: Kill and remove old docker containers
+#        run: |
+#          docker ps -a --filter "status=running" --format '{{.ID}} {{.Image}}' | findstr "davidtest" | ForEach-Object { docker kill $_.split(" ")[0] }
+#          docker ps -a --filter "status=exited" --format '{{.ID}} {{.Image}}' | findstr "davidtest" | ForEach-Object { docker rm $_.split(" ")[0] }
           
       - name: Check if containers are removed
         run: docker container ls -a 
