@@ -38,29 +38,23 @@ jobs:
           echo "List of all docker images:"
           docker images -a 
 
-#      - name: Force Delete images because of size
-#        run: docker images -a --filter "reference=davidtest:*" --format "{{.Repository}}:{{.Tag}}" | ForEach-Object { docker rmi $_ }
-
       - name: Build docker image
         run: docker build -t ${{env.APP_NAME}}:${{github.sha}} .
 
-      - name: Check which docker images are going to be removed
-        run: |  
-          $imageID = docker images -q -a --filter "reference=${{env.APP_NAME}}:${{github.sha}}"
-          echo $imageID
-          echo "These images are in the before filter"
-          docker images -q -a --filter "before=${imageID}" --filter "reference=${{env.APP_NAME}}:*" 
-
-#      - name: Kill and remove old docker containers
-#        run: |
-#          docker ps -a --filter "status=running" --format '{{.ID}} {{.Image}}' | findstr ${{env.APP_NAME}} | ForEach-Object { docker kill $_.split(" ")[0] }
-#          docker ps -a --filter "status=exited" --format '{{.ID}} {{.Image}}' | findstr ${{env.APP_NAME}} | ForEach-Object { docker rm $_.split(" ")[0] }
-#          echo "Remaining containers:"
-#          docker container ls -a
+      - name: Kill and remove old docker containers
+        run: |
+          docker ps -a --filter "status=running" --format '{{.ID}} {{.Image}}' | findstr ${{env.APP_NAME}} | ForEach-Object { docker kill $_.split(" ")[0] }
+          docker ps -a --filter "status=exited" --format '{{.ID}} {{.Image}}' | findstr ${{env.APP_NAME}} | ForEach-Object { docker rm $_.split(" ")[0] }
+          echo "Remaining containers:"
+          docker container ls -a
 
       - name: Remove docker images
         run: |  
           $imageID = docker images -q -a --filter "reference=${{env.APP_NAME}}:${{github.sha}}"
+          echo "Current image:"
+          echo $imageID
+          echo "Image that are to be removed:"
+          echo docker images -q -a --filter "before=${imageID}" --filter "reference=${{env.APP_NAME}}:*"
           docker images -q -a --filter "before=${imageID}" --filter "reference=${{env.APP_NAME}}:*" | ForEach-Object { docker rmi $_ }
  
       - name: Run docker container
@@ -80,3 +74,10 @@ jobs:
           docker container ls -a 
           echo "List of all docker images:"
           docker images -a 
+
+      - name: Remove dangling images
+        run: |
+          docker images -f dangling=true
+          echo "List of all docker images after removing dangling images:"
+          docker images -a 
+          
