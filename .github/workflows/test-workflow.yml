@@ -68,7 +68,7 @@ jobs:
         run: |  
           $imageID = docker images -q -a --filter "reference=${{env.APP_NAME}}:${{github.sha}}"
           echo "These images are in the before filter"
-          docker images -q -a --filter "before=$imageID"
+          docker images -q -a --filter "before=${imageID}"
         # docker images -q -a --filter "before=$imageID" | ForEach-Object { docker rmi $_ } 
  
       - name: Run docker container
