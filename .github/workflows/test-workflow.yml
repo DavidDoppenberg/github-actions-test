@@ -57,7 +57,6 @@ jobs:
           $imageID = docker images -q -a --filter "reference=${{env.APP_NAME}}:${{github.sha}}"
           echo ${imageID}
           echo $imageID
-          echo $(imageID)
           echo "These images are in the before filter"
           docker images -q -a --filter "before=${imageID}" --filter "reference=${{env.APP_NAME}}*:*"
 
