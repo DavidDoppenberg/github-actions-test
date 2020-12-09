@@ -20,7 +20,9 @@ jobs:
     # The type of runner that the job will run on
     runs-on: self-hosted
 
-    # TODO: env in 
+    env:
+      TEST_VAR: "test variable",
+      SECRET: ${{ secrets.SECRET_MESSAGE }}
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -48,9 +50,6 @@ jobs:
 
       - name: Run docker container
         run: docker container run --env-file .env davidtest:${{github.sha}} python app.py
-        env:
-          TEST_VAR: "test variable"
-          SECRET:  ${{ secrets.SECRET_MESSAGE }}
 
       - name: check connection
         run: |
