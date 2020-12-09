@@ -24,7 +24,7 @@ jobs:
     env:
       TEST_VAR: "test variable"
       SECRET: ${{ secrets.SECRET_MESSAGE }}
-      TEST_NAME: "davidtest"
+      APP_NAME: "davidtest"
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -33,7 +33,7 @@ jobs:
 
       - name: test global env
         run: |
-          echo ${{env.TEST_NAME}}
+          echo ${{env.APP_NAME}}
 
       - name: List all current containers and images
         run: |
@@ -43,20 +43,20 @@ jobs:
           docker images -a 
 
       - name: Build docker image
-        run: docker build -t $TEST_NAME:${{github.sha}} .
+        run: docker build -t ${{env.APP_NAME}}:${{github.sha}} .
 
       #TODO: only kill containers if building was OK
       #TODO: use before filter of current github commit hash to filter images and containers
       - name: Kill and remove old docker containers and images
         run: |
-          echo "$TEST_NAME:${{github.sha}}"
-          $imageID = docker ps -q -a --reference "$TEST_NAME:${{github.sha}}"
-          docker ps -a --filter "status=running" --format '{{.ID}} {{.Image}}' | findstr "davidtest" | ForEach-Object { docker kill $_.split(" ")[0] }
-          docker ps -a --filter "status=exited" --format '{{.ID}} {{.Image}}' | findstr "davidtest" | ForEach-Object { docker rm $_.split(" ")[0] }
+          echo "${{env.APP_NAME}}:${{github.sha}}"
+          $imageID = docker ps -q -a --reference "${{env.APP_NAME}}:${{github.sha}}"
+          docker ps -a --filter "status=running" --format '{{.ID}} {{.Image}}' | findstr ${{env.APP_NAME}} | ForEach-Object { docker kill $_.split(" ")[0] }
+          docker ps -a --filter "status=exited" --format '{{.ID}} {{.Image}}' | findstr ${{env.APP_NAME}} | ForEach-Object { docker rm $_.split(" ")[0] }
           docker images -q -a --filter "before=$imageID" | ForEach-Object { docker rmi $_ } 
  
       - name: Run docker container
-        run: docker container run --env-file .env $TEST_NAME:${{github.sha}} python app.py
+        run: docker container run --env-file .env ${{env.APP_NAME}}:${{github.sha}} python app.py
 
       - name: check connection
         run: |
