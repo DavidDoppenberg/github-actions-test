@@ -45,6 +45,7 @@ jobs:
       # TODO: find out why the docker ps command fail if no container can be killed/removed
       - name: Remove old docker containers and images
         run: |
+          echo "Containers that are removed:"
           docker ps -a --filter "status=running" --format '{{.ID}} {{.Image}}' | findstr ${{env.APP_NAME}} | ForEach-Object { docker kill $_.split(" ")[0] }
           docker ps -a --filter "status=exited" --format '{{.ID}} {{.Image}}' | findstr ${{env.APP_NAME}} | ForEach-Object { docker rm $_.split(" ")[0] }
           $imageID = docker images -q -a --filter "reference=${{env.APP_NAME}}:${{github.sha}}"
@@ -57,12 +58,12 @@ jobs:
       - name: Run docker container
         run: docker container run --env-file .env ${{env.APP_NAME}}:${{github.sha}} python app.py
 
-      - name: check connection
+      - name: Check connection
         run: |
-          echo "Check if website is reachable"
+          echo "Check if website is reachable:"
           $response = curl https://www.google.com
           echo $response.statusCode
-          echo "Check content markdown file"
+          echo "Check content markdown file:"
           Get-Content README.md
 
       - name: List all current containers and images
