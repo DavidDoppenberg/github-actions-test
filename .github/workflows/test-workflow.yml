@@ -33,7 +33,7 @@ jobs:
 
       - name: test global env
         run: |
-          echo ${{TEST_NAME}}
+          echo ${{job.build.env.TEST_NAME}}
 
       - name: List all current containers and images
         run: |
