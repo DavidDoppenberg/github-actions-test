@@ -49,7 +49,7 @@ jobs:
       #TODO: use before filter of current github commit hash to filter images and containers
       - name: Kill and remove old docker containers and images
         run: |
-          $imageID = docker images -q -a --filter "reference ${{env.APP_NAME}}:${{github.sha}}"
+          $imageID = docker images -q -a --filter "reference=${{env.APP_NAME}}:${{github.sha}}"
           docker ps -a --filter "status=running" --format '{{.ID}} {{.Image}}' | findstr ${{env.APP_NAME}} | ForEach-Object { docker kill $_.split(" ")[0] }
           docker ps -a --filter "status=exited" --format '{{.ID}} {{.Image}}' | findstr ${{env.APP_NAME}} | ForEach-Object { docker rm $_.split(" ")[0] }
           docker images -q -a --filter "before=$imageID" | ForEach-Object { docker rmi $_ } 
