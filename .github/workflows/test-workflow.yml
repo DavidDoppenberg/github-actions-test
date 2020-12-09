@@ -56,7 +56,7 @@ jobs:
         run: |  
           $imageID = docker images -q -a --filter "reference=${{env.APP_NAME}}:${{github.sha}}"
           echo "These images are in the before filter"
-          docker images -q -a --filter "before=$imageID" --filter "reference=${{env.APP_NAME}}*:*"
+          docker images -q -a --filter "before=${imageID}" --filter "reference=${{env.APP_NAME}}*:*"
 
       - name: Force Delete images because of size
         run: docker images -a --filter "reference=davidtest:*" --format "{{.Repository}}:{{.Tag}}" | ForEach-Object { docker rmi $_ }
