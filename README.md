@@ -1,3 +1,2 @@
 # github-actions-test
-Repository for testing github actions
-Test
+This a markdown file

@@ -20,9 +20,11 @@ jobs:
     # The type of runner that the job will run on
     runs-on: self-hosted
 
+    # Configuration of the workflow
     env:
       TEST_VAR: "test variable"
       SECRET: ${{ secrets.SECRET_MESSAGE }}
+      APP_NAME: "davidtest"
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -31,33 +33,39 @@ jobs:
 
       - name: List all current containers and images
         run: |
+          echo "List of all docker containers:"
           docker container ls -a 
+          echo "List of all docker images:"
           docker images -a 
 
       #TODO: only kill containers if building was OK
       #TODO: use before filter of current github commit hash to filter images and containers
       - name: Kill and remove old docker containers
         run: |
-          docker ps -a --filter "status=running" --format '{{.ID}} {{.Image}}' | findstr "davidtest" | ForEach-Object { docker kill $_.split(" ")[0] }
-          docker ps -a --filter "status=exited" --format '{{.ID}} {{.Image}}' | findstr "davidtest" | ForEach-Object { docker rm $_.split(" ")[0] }
+          docker ps -a --filter "status=running" --format '{{.ID}} {{.Image}}' | findstr ${{APP_NAME}} | ForEach-Object { docker kill $_.split(" ")[0] }
+          docker ps -a --filter "status=exited" --format '{{.ID}} {{.Image}}' | findstr ${{APP_NAME}} | ForEach-Object { docker rm $_.split(" ")[0] }
 
       # You cannot just pass the full lines to docker rmi. The command expects an image ID, so you need to extract that from the string
       - name: Remove old images
-        run: docker images -a --filter "reference=davidtest:*" --format "{{.Repository}}:{{.Tag}}" | ForEach-Object { docker rmi $_ } 
+        run: docker images -a --filter "reference=${{APP_NAME}}:*" --format "{{.Repository}}:{{.Tag}}" | ForEach-Object { docker rmi $_ } 
  
       - name: Build docker image
-        run: docker build -t davidtest:${{github.sha}} .
+        run: docker build -t ${{APP_NAME}}:${{github.sha}} .
 
       - name: Run docker container
-        run: docker container run --env-file .env davidtest:${{github.sha}} python app.py
+        run: docker container run --env-file .env ${{APP_NAME}}:${{github.sha}} python app.py
 
       - name: check connection
         run: |
+          echo "Check if website is reachable"
           $response = curl https://www.google.com
           echo $response.statusCode
+          echo "Check content markdown file"
           Get-Content README.md
 
       - name: List all current containers and images
         run: |
+          echo "List of all docker containers:"
           docker container ls -a 
+          echo "List of all docker images:"
           docker images -a 
