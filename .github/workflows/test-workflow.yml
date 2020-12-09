@@ -51,17 +51,17 @@ jobs:
           echo "These images are in the before filter"
           docker images -q -a --filter "before=${imageID}" --filter "reference=${{env.APP_NAME}}:*" 
 
-      - name: Kill and remove old docker containers
-        run: |
-          docker ps -a --filter "status=running" --format '{{.ID}} {{.Image}}' | findstr ${{env.APP_NAME}} | ForEach-Object { docker kill $_.split(" ")[0] }
-          docker ps -a --filter "status=exited" --format '{{.ID}} {{.Image}}' | findstr ${{env.APP_NAME}} | ForEach-Object { docker rm $_.split(" ")[0] }
-          echo "Remaining containers:"
-          docker container ls -a
+#      - name: Kill and remove old docker containers
+#        run: |
+#          docker ps -a --filter "status=running" --format '{{.ID}} {{.Image}}' | findstr ${{env.APP_NAME}} | ForEach-Object { docker kill $_.split(" ")[0] }
+#          docker ps -a --filter "status=exited" --format '{{.ID}} {{.Image}}' | findstr ${{env.APP_NAME}} | ForEach-Object { docker rm $_.split(" ")[0] }
+#          echo "Remaining containers:"
+#          docker container ls -a
 
       - name: Remove docker images
         run: |  
           $imageID = docker images -q -a --filter "reference=${{env.APP_NAME}}:${{github.sha}}"
-          docker images -q -a --filter "before=${imageID}" --filter "reference=${{env.APP_NAME}}:*" | ForEach-Object { docker rmi $_ }"
+          docker images -q -a --filter "before=${imageID}" --filter "reference=${{env.APP_NAME}}:*" | ForEach-Object { docker rmi $_ }
  
       - name: Run docker container
         run: docker container run --env-file .env ${{env.APP_NAME}}:${{github.sha}} python app.py
