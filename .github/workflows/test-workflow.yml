@@ -50,15 +50,14 @@ jobs:
           echo "List of all docker images:"
           docker images -a 
 
-      # Also filter images on reference to make sure you are only deleting davidtest related images.
       - name: Remove old docker containers and images
         run: |
           echo "Containers that are removed:"
           docker ps -q -a --filter "status=running" --filter "name=$env:APP_NAME" | ForEach-Object { docker kill $_ }
           docker ps -q -a --filter "status=exited" --filter "name=$env:APP_NAME" | ForEach-Object { docker rm $_ }
           echo "Images that are going to be removed:"
-          docker images -a --filter "before=${env:APP_NAME}:${{github.sha}}" --filter "reference=${env:APP_NAME}:*"
-          docker images -q -a --filter "before=${env:APP_NAME}:${{github.sha}}" --filter "reference=${env:APP_NAME}:*" | ForEach-Object { docker rmi $_ }
+          docker images -a --filter "reference=${env:APP_NAME}:*"
+          docker images -q -a --filter "reference=${env:APP_NAME}:*" | ForEach-Object { docker rmi $_ }
 
       - name: Build docker image
         run: | 
