@@ -1,2 +1,4 @@
+# Add list of environment variables that need to be passed to the docker application.
+# The values should be put in the "env:" section of the workflow.yml file 
 TEST_VAR
 SECRET
