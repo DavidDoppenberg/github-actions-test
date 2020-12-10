@@ -1,5 +1,4 @@
 import os
-import sys
 
 
 def error(text):
@@ -26,6 +25,7 @@ secret = read_env("SECRET", optional=True)
 print("Hello!")
 print("ENV variable:", test_var)
 print("Secret check:", secret == "secret")
+print("Additional print")
 print("Additional print")
 print("Additional print")
 print("Additional print")
