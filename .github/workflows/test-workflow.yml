@@ -36,7 +36,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Env test
-        run: echo env:APP_NAME
+        run: echo $env:APP_NAME
 
       - name: List all current containers and images
         run: |
@@ -56,8 +56,8 @@ jobs:
       - name: Remove old docker containers and images
         run: |
           echo "Containers that are removed:"
-          docker ps -a --filter "status=running" --format '{{.ID}} {{.Image}}' | findstr ${{env.APP_NAME}} | ForEach-Object { docker kill $_.split(" ")[0] }
-          docker ps -a --filter "status=exited" --format '{{.ID}} {{.Image}}' | findstr ${{env.APP_NAME}} | ForEach-Object { docker rm $_.split(" ")[0] }
+          docker ps -q -a --filter "status=running" --filter "name=${{env.APP_NAME}}" | ForEach-Object { docker kill $_ }
+          docker ps -q -a --filter "status=exited" --filter "name=${{env.APP_NAME}}" | ForEach-Object { docker rm $_ }
           $imageID = docker images -q -a --filter "reference=${{env.APP_NAME}}:${{github.sha}}"
           echo "Current image:"
           echo $imageID
